@@ -166,9 +166,18 @@ class datas{
         }
     }
     
+    void update_data() {
+    	// ArrayList - set 사용하기
+    }
+    
     boolean isEmpty() {
         if (this.dList.size() == 0) return true;
         else return false;
+    }
+    
+    boolean isMyData() {
+    	// update , delete 에 적용
+    	return true;
     }
     
     int findDataNum(String fTitle) {
@@ -178,7 +187,8 @@ class datas{
             for(int i=0; i<this.dList.size(); i++) if (fTitle.equals(this.dList.get(i).get("제목"))) return (i);
         }return -1;
     }
-
+ 
+    
     
     
     
