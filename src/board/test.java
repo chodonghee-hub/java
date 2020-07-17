@@ -8,84 +8,88 @@ public class test {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Scanner sc = new Scanner(System.in);
-		HashMap<String, String> comlist = new HashMap<String, String>();
-
-        //cmdList
-        comlist.put("add","데이터 추가");
-        comlist.put("read","데이터 조회");
-        comlist.put("update","데이터 수정");
-        comlist.put("delete","데이터 삭제");
-		
+		Scanner sc = new Scanner(System.in);		
+		users u = new users();
 		datas dt = new datas();
+		
+		System.out.println("===========================");
 		System.out.println("프로그램을 시작합니다.");
 		while(true) {
-			System.out.print("명령어를 입력해주세요 : ");
+			System.out.println("===========================");
+			System.out.print("▶ 명령어를 입력해주세요 >>> ");
 			String cmd = sc.next();
-			if(cmd.equals("help")) for(String key : comlist.keySet()) System.out.printf("* ['%s'] : %s \n",key,comlist.get(key));
-			else if(cmd.equals("add")) {
-				dt.make_data();
-			}
-			else if(cmd.equals("read")) {
-				dt.read_data();
-			}
-			else if(cmd.equals("update")) {
+			if(cmd.equals("help")) dt.help_data();
+			else if(cmd.equals("a")) dt.make_data();
+			else if(cmd.equals("r")) dt.read_data();
+			else if(cmd.equals("u")) {
 				//
 			}
-			else if(cmd.equals("delete")) {
-				dt.delete_data();
-			}
+			else if(cmd.equals("d")) dt.delete_data();
 		}
 	}
 
 }
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class users{
-	String userName = null;
-	users(){
-		this.users_main();
-	}
-	
-	 
 	HashMap<String, Object> user = new HashMap<String, Object>();
 	ArrayList<HashMap<String, Object>> user_list = new ArrayList<HashMap<String, Object>>();
-	HashMap<String, String>  uCommands = new HashMap<String, String>();
+	HashMap<String, String> user_cmd = new HashMap<String, String>();
 	
-	//user - Commands
+	static String userName = null;
 	
+	users(){
+		//user - Commands
+		user_cmd.put("[S] sign_up","회원가입");
+		user_cmd.put("[L] login","로그인");
+		
+		this.users_main();
+	}
 	Scanner sc = new Scanner(System.in);
 	
 	void users_main() {
+		System.out.println("===========================");
 		System.out.println("▶ Select Mode ◀");
-		System.out.print("모드를 선택해주세요 : ");
-		String cmd = sc.nextLine();
-		if (cmd.equals("help")) {
-			//help()
-		}
-		else if (cmd.equals("signUp")) {
-			this.signUp();
-		}
-		else if (cmd.equals("login")) {
-			//login()
+		while (userName == null) {
+			System.out.println("===========================");
+			System.out.printf("총 회원수 : %d\n", user_list.size());
+			System.out.print("모드를 선택해주세요 : ");
+			String cmd = sc.nextLine();
+//			cmd.toLowerCase();
+			if (cmd.equals("help")) this.help();
+			else if (cmd.equals("s")) this.signUp();
+			else if (cmd.equals("l")) this.login();
 		}
 	}
 	
-	void login() {
+	
+	boolean login() {
+		System.out.println("===========================");
 		System.out.println("▶ Login Mode ◀");
 		System.out.print("▷ ID >>> ");
 		String ID = sc.nextLine();
 		System.out.print("▷ PW >>> ");
 		int PW = sc.nextInt();
-		for (int i=0; i<user_list.size(); i++) {
-			HashMap<String, Object> nowUser = user_list.get(i);
-			
-				
+		sc.nextLine();
+		for (int i=0; i<this.user_list.size(); i++) {
+			if (this.user_list.get(i).get("ID").equals((String)ID)) {
+				if(this.user_list.get(i).get("PW").equals((Integer)PW)) {
+					this.userName =  (String)(this.user_list.get(i).get("Name"));
+					System.out.printf("\n★ '%s'님이 로그인 하였습니다 \n", this.userName);
+					return true;
+				}
+			}
 		}
+		System.out.println("Error - failed login your ID .. ");
+		return false;
 	}
-		
 	
+	void help() {
+		System.out.println("===========================");
+		for(String key : user_cmd.keySet()) System.out.printf("* %s : %s \n",key,user_cmd.get(key));
+	}
 	
 	void signUp() {
+		System.out.println("===========================");
 		System.out.println("▶ Sign-Up Mode ◀");
 		System.out.print("▷ ID >>> ");
 		String ID = sc.nextLine();
@@ -97,29 +101,32 @@ class users{
 		user.put("ID", ID);
 		user.put("PW", PW);
 		user.put("Name", Name);
-		user_list.add(user);
-		System.out.printf("'%s'님의 회원가입이 완료되었습니다. \n",Name);
+		this.user_list.add(user);
+		System.out.printf("\n★ '%s'님의 회원가입이 완료되었습니다. \n",Name);
 	}
-	
-	
 }
-
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class datas{
     //data type = {"제목" , "작성자", "내용"}
     HashMap<String, String> data = new HashMap<String, String>();
+    HashMap<String, String> data_cmd = new HashMap<String, String>();
     ArrayList<HashMap<String, String>> dList = new ArrayList<HashMap<String, String>>();
     Scanner sc = new Scanner(System.in);
-    
-    //userName 
-    users u = new users();
     
     //variable 
     static int dataNum = -1;
     datas(){
-        
+    	//datas_commads
+        data_cmd.put("[A] add", "데이터 추가");
+        data_cmd.put("[R] read", "데이터 조회");
+        data_cmd.put("[U] update", "데이터 수정");
+        data_cmd.put("[D] delete", "데이터 삭제");
+    }
+    void help_data() {
+    	for (String key : data_cmd.keySet()) System.out.printf("*%s : %s\n", key, data_cmd.get(key));
     }
     void make_data() {
+    	System.out.println("===========================");
     	System.out.println("▶ Make Mode");
     	System.out.print("* 제목 : ");
     	String title = sc.nextLine();
@@ -127,12 +134,13 @@ class datas{
     	System.out.print("* 내용 : ");
     	String detail = sc.nextLine();
         data.put("내용", detail);
-        data.put("작성자", u.userName);
-        dList.add(data);
+        data.put("작성자", users.userName);
+        this.dList.add(data);
         System.out.println("데이터 생성이 완료 되었습니다. ");
     }
     
     void read_data() {
+    	System.out.println("===========================");
     	String kTitle = null;
     	String kDetail = null;
     	String kUser = null;
@@ -150,6 +158,7 @@ class datas{
     }
     
     void delete_data() {
+    	System.out.println("===========================");
     	int delNum = -1;
         System.out.println("▶ Delete Mode");
         System.out.print("삭제할 데이터 제목을 입력해주세요 : ");
@@ -167,6 +176,7 @@ class datas{
     }
     
     void update_data() {
+    	System.out.println("===========================");
     	// ArrayList - set 사용하기
     }
     
