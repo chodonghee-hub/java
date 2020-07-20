@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import util.Util;
+
 public class test {
 
 	public static void main(String[] args) {
@@ -73,8 +75,8 @@ class users{
 		for (int i=0; i<this.user_list.size(); i++) {
 			if (this.user_list.get(i).get("ID").equals((String)ID)) {
 				if(this.user_list.get(i).get("PW").equals((Integer)PW)) {
-					this.userName =  (String)(this.user_list.get(i).get("Name"));
-					System.out.printf("\n★ '%s'님이 로그인 하였습니다 \n", this.userName);
+					userName =  (String)(this.user_list.get(i).get("Name"));
+					System.out.printf("\n★ '%s'님이 로그인 하였습니다 \n", userName);
 					return true;
 				}
 			}
@@ -107,8 +109,6 @@ class users{
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class datas{
-    //data type = {"제목" , "작성자", "내용"}
-    HashMap<String, String> data = new HashMap<String, String>();
     HashMap<String, String> data_cmd = new HashMap<String, String>();
     ArrayList<HashMap<String, String>> dList = new ArrayList<HashMap<String, String>>();
     Scanner sc = new Scanner(System.in);
@@ -126,6 +126,8 @@ class datas{
     	for (String key : data_cmd.keySet()) System.out.printf("*%s : %s\n", key, data_cmd.get(key));
     }
     void make_data() {
+    	//data type = {"제목" , "작성자", "내용","날짜"}
+    	HashMap<String, String> data = new HashMap<String, String>();
     	System.out.println("===========================");
     	System.out.println("▶ Make Mode");
     	System.out.print("* 제목 : ");
@@ -135,8 +137,12 @@ class datas{
     	String detail = sc.nextLine();
         data.put("내용", detail);
         data.put("작성자", users.userName);
+        data.put("날짜", Util.getCurrentDate());
+        
+        // add point 
         this.dList.add(data);
         System.out.println("데이터 생성이 완료 되었습니다. ");
+        System.out.printf("- 제목 : %s\n- 내용 : %s\n- 작성자 : %s\n",title, detail, users.userName);
     }
     
     void read_data() {
@@ -144,14 +150,16 @@ class datas{
     	String kTitle = null;
     	String kDetail = null;
     	String kUser = null;
+    	String kDate = null;
         System.out.println("▶ Read Mode");
         if(isEmpty()) System.out.println("Error - data list is empty ..");
         else {
         	for (int i=0; i<this.dList.size(); i++) {
-        		for (String key : data.keySet()) {
-        			if (key == "제목") kTitle = data.get(key);
-        			else if (key == "내용") kDetail = data.get(key);
-        			else if (key == "작성자") kUser = data.get(key);
+        		for (String key : dList.get(i).keySet()) {
+        			if (key == "제목") kTitle = dList.get(i).get(key);
+        			else if (key == "내용") kDetail = dList.get(i).get(key);
+        			else if (key == "작성자") kUser = dList.get(i).get(key);
+        			else if (key == "날짜") kDate = dList.get(i).get(key);
         		}
         	}System.out.printf("* [제목] : %s \n* [내용] : %s\n* [작성자] : %s\n",kTitle, kDetail, kUser);
         }
@@ -162,17 +170,19 @@ class datas{
     	int delNum = -1;
         System.out.println("▶ Delete Mode");
         System.out.print("삭제할 데이터 제목을 입력해주세요 : ");
-        String quest = sc.next();
-        if (isEmpty() != true) {
-        	for(int i=0; i<this.dList.size(); i++) {
-            	delNum = this.findDataNum(quest);
-            	if(delNum != -1) {
-            		this.dList.remove(delNum);
-            		System.out.println("데이터가 삭제되었습니다.");
-            		break;
-            	}
-            }
-        }
+        String quest = sc.nextLine();
+        if(this.isMyData(this.findDataNum(quest))==true) {
+	        if (isEmpty() != true) {
+	        	for(int i=0; i<this.dList.size(); i++) {
+	            	delNum = this.findDataNum(quest);
+	            	if(delNum != -1) {
+	            		this.dList.remove(delNum);
+	            		System.out.println("데이터가 삭제되었습니다.");
+	            		break;
+	            	}
+	            }
+	        }
+        }else System.out.println("Error - cannot touch others data .. ");
     }
     
     void update_data() {
@@ -185,9 +195,10 @@ class datas{
         else return false;
     }
     
-    boolean isMyData() {
+    boolean isMyData(int dataNum) {
     	// update , delete 에 적용
-    	return true;
+    	if (dList.get(dataNum).get("작성자") == users.userName) return true;
+    	return false;
     }
     
     int findDataNum(String fTitle) {
@@ -198,10 +209,9 @@ class datas{
         }return -1;
     }
  
-    
-    
-    
-    
-    
-    
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
