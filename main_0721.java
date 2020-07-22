@@ -253,6 +253,7 @@ class article{
         return false;
     }
     
+    
     ArrayList<HashMap<String, Object>> _getArticle_key_(String artcKW, String typeKW) {
         ArrayList<HashMap<String, Object>> temp = new ArrayList<HashMap<String, Object>>();
         for(int i=0; i<artcList.size(); i++) {
