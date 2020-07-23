@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class main_0721 {
-
+public class main {
+	static ArrayList<HashMap<String, Object>> artcList = new ArrayList<HashMap<String, Object>>();
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+
+	    
 		while(new users()._selectMode_()) {
 			new article();
 		}
@@ -20,9 +23,11 @@ class users{
     Scanner sc = new Scanner(System.in);
 
     static String userName = null;
+    static String userPos = null;
 
     users(){
-        signUp("timandsunny",1234,"donghee");
+        signUp("timandsunny",1234,"donghee","Admin");
+
     }
 
     boolean _selectMode_() {
@@ -48,7 +53,7 @@ class users{
                 sc.nextLine();
                 System.out.print("▷ Enter new nick name \n>>> ");
                 String Name = sc.nextLine();
-                signUp(ID, PW, Name);
+                signUp(ID, PW, Name, "User");
 
             }
             else if (cmd.equals("l")) if(_login_()) return true;
@@ -59,11 +64,12 @@ class users{
         }return false;
     }
 
-    void signUp(String ID, int PW, String Name){
+    void signUp(String ID, int PW, String Name, String pos){
         HashMap<String, Object> user = new HashMap<String, Object>();
         user.put("ID",ID);
         user.put("PW", PW);
         user.put("Name",Name);
+        user.put("Position", pos);
         userList.add(user);
 
         System.out.printf("Success sign up - '%s'\n",Name);
@@ -81,6 +87,7 @@ class users{
         for(int i=0; i<userList.size(); i++) {
             if (loginID.equals(userList.get(i).get("ID")) && (loginPW == (int) userList.get(i).get("PW"))) {
                 userName = (String) userList.get(i).get("Name");
+                userPos = (String) userList.get(i).get("Position");
                 System.out.printf("* Success login - '%s'\n",userName);
                 return true;
             }
@@ -91,19 +98,28 @@ class users{
 class article{
 
     Scanner sc = new Scanner(System.in);
-    ArrayList<HashMap<String, Object>> artcList = new ArrayList<HashMap<String, Object>>();
-
-    article(){
-        selectMode();
-    }
-
+    
     int total_artc = 1;
 
+    article(){
+    	addArticle("test1", "test1","hong");
+        addArticle("test2", "test2","cha");
+        addArticle("test3", "test3","kim");
+        
+        selectMode(); 
+    }
+    
+    boolean _Admin_() {
+    	if (users.userPos.equals("Admin")) return true;
+    	return false;
+    }
+    
     void selectMode() {
         System.out.println("======================");
         System.out.println("▶ Select Mode < ARTICLE >");
-        System.out.printf("article : %d\n",artcList.size());
+        System.out.printf("article : %d\n",main.artcList.size());
         while(true) {
+        	
             System.out.println("======================");
             System.out.print("▷ Enter the next proccess \n>>> ");
             String cmd = sc.nextLine();
@@ -122,7 +138,7 @@ class article{
                 String title = sc.nextLine();
                 System.out.printf("▷ Enter new detail \n>>> ");
                 String detail = sc.nextLine();
-                addArticle(title, detail);
+                addArticle(title, detail, users.userName);
                 System.out.printf("* '1' more article is added - 'by : %s\n",users.userName);
             }
 
@@ -138,28 +154,28 @@ class article{
 
     }
 
-    void addArticle(String title, Object detail) {
+    void addArticle(String title, Object detail, String user) {
         HashMap<String, Object> article = new HashMap<String, Object>();
         ArrayList<String> hit_list = new ArrayList<String>();
         article.put("Number", total_artc);
         article.put("Title", title);
-        article.put("Writer", users.userName);
+        article.put("Writer", user);
         article.put("Detail", detail);
         article.put("View", 0);
         article.put("Hit", hit_list);
 
-        artcList.add(article);
+        main.artcList.add(article);
         total_artc ++;
     }
 
     void chkReadType() {
         System.out.println("======================");
         System.out.println("▶ Read Mode");
-        System.out.print("▷ [A] : read all article \n▷ [N] : read especial article \n>>> ");
+        System.out.print("▷ [A] : read all article \n▷ [N] : read especial article \n▷ [D] : read detail article \n>>> ");
         String cmdRead = sc.nextLine();
         if (cmdRead.equals("a")) {
-        	if(artcList.size() != 0) {
-	            for(int i=0; i<artcList.size(); i++) {
+        	if(main.artcList.size() != 0) {
+	            for(int i=0; i<main.artcList.size(); i++) {
 	                readArtc_Title(i);
 	            }System.out.println("******************");
         	}else System.out.println("* Error - article list is empty ... ");
@@ -188,26 +204,29 @@ class article{
         	System.out.print("\n▷ Enter the article number : ");
         	int artcNum = sc.nextInt();
         	sc.nextLine();
-        	if(_isExitArticle_(artcNum)) readArtc_Detail(artcNum);
+        	if(_isExitArticle_(artcNum)) readArtc_Detail(artcNum-1);
+        	System.out.println("******************");
         }
     }
     
     void readArtc_Title(int num) {
     	System.out.println("******************");
-    	System.out.printf("▷ Artc Num ['%d'] \n",artcList.get(num).get("Number"));
-    	System.out.printf("* [Title] : %s\n\n",artcList.get(num).get("Title"));
+    	System.out.printf("▷ Artc Num ['%d'] \n",main.artcList.get(num).get("Number"));
+    	System.out.printf("* [Title] : %s\n\n",main.artcList.get(num).get("Title"));
     }
     
     void readArtc_Detail(int num) {
+    	main.artcList.get(num).put("View", (int) main.artcList.get(num).get("View")+1);
+    	
     	System.out.println("******************");
     	@SuppressWarnings("unchecked")
-		ArrayList<String> temp_hit = (ArrayList<String>)artcList.get(num).get("Hit");
-        System.out.printf("▷ Artc Num ['%d'] \n",artcList.get(num).get("Number"));
-        System.out.printf("* [Title] : %s\n",artcList.get(num).get("Title"));
-        System.out.printf("* [Writer] : %s\n",artcList.get(num).get("Writer"));
-        System.out.printf("* [Detail] : %s \n",artcList.get(num).get("Detail"));
+		ArrayList<String> temp_hit = (ArrayList<String>)main.artcList.get(num).get("Hit");
+        System.out.printf("▷ Artc Num ['%d'] \n",main.artcList.get(num).get("Number"));
+        System.out.printf("* [Title] : %s\n",main.artcList.get(num).get("Title"));
+        System.out.printf("* [Writer] : %s\n",main.artcList.get(num).get("Writer"));
+        System.out.printf("* [Detail] : %s \n",main.artcList.get(num).get("Detail"));
         System.out.printf("* [Hit] : %d \n",temp_hit.size());
-        System.out.printf("* [View] : %d \n",artcList.get(num).get("View"));
+        System.out.printf("* [View] : %d \n",main.artcList.get(num).get("View"));
     }
     
     void updateArticle() {
@@ -217,12 +236,20 @@ class article{
         int  artcNum  = sc.nextInt();
         sc.nextLine();
         if(_isExitArticle_(artcNum) ){
-            if ( _isMyArticle_(artcNum)) {
-                System.out.print("▷ Enter the new data \n>>> ");
+        	if (_Admin_() != true) {
+	            if ( _isMyArticle_(artcNum)) {
+	                System.out.print("▷ Enter the new data \n>>> ");
+	                String newData = sc.nextLine();
+	                main.artcList.get(artcNum-1).put("Detail",newData);
+	                System.out.printf("* Success update article - artcNum : '%d'\n",artcNum);
+	            }else System.out.println("* Error - can't touch other's article ... ");
+        	}
+        	else {
+        		System.out.print("▷ Enter the new data \n>>> ");
                 String newData = sc.nextLine();
-                artcList.get(artcNum-1).put("Detail",newData);
+                main.artcList.get(artcNum-1).put("Detail",newData);
                 System.out.printf("* Success update article - artcNum : '%d'\n",artcNum);
-            }else System.out.println("* Error - can't touch other's article ... ");
+        	}
         }else System.out.println("* Error - can't find article ... ");
         
     }
@@ -232,9 +259,16 @@ class article{
         System.out.println("▶ Delete Mode");
         System.out.print("▷ Enter the delete article's number : ");
         int artcNum = sc.nextInt();
-        if(_isExitArticle_(artcNum) && _isMyArticle_(artcNum)) {
-        	artcList.remove(artcNum-1);
-        	System.out.printf("* Artc number '%d' is deleted by '%s'\n",artcNum, users.userName);
+        if(_isExitArticle_(artcNum)) {
+        	if (_Admin_() != true) {
+	        	if (_isMyArticle_(artcNum)) {
+	        		main.artcList.remove(artcNum-1);
+	            	System.out.printf("* Artc number '%d' is deleted by '%s'\n",artcNum, users.userName);
+	        	}
+        	}else {
+        		main.artcList.remove(artcNum-1);
+            	System.out.printf("* Artc number '%d' is deleted by 'Admin'\n",artcNum);
+        	}
         }
     }
     
@@ -244,21 +278,21 @@ class article{
 //    }
     
     boolean _isMyArticle_(int artcNum) {
-        if ((users.userName).equals((String)artcList.get(artcNum-1).get("Writer"))) return true;  
+        if ((users.userName).equals((String) main.artcList.get(artcNum-1).get("Writer"))) return true;  
         return false;
     }
     
     boolean _isExitArticle_(int artcNum) {
-        for (int i=0; i<artcList.size(); i++) if (artcNum == (int)artcList.get(i).get("Number")) return true;
+        for (int i=0; i<main.artcList.size(); i++) if (artcNum == (int)main.artcList.get(i).get("Number")) return true;
         return false;
     }
     
     
     ArrayList<HashMap<String, Object>> _getArticle_key_(String artcKW, String typeKW) {
         ArrayList<HashMap<String, Object>> temp = new ArrayList<HashMap<String, Object>>();
-        for(int i=0; i<artcList.size(); i++) {
-            String findRst = (String) artcList.get(i).get(typeKW);
-            if (findRst.contains(artcKW)) temp.add(artcList.get(i));
+        for(int i=0; i<main.artcList.size(); i++) {
+            String findRst = (String) main.artcList.get(i).get(typeKW);
+            if (findRst.contains(artcKW)) temp.add(main.artcList.get(i));
         }
         return temp;
     }
